@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante de Compra - Mi Tienda</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8fafc; color: #222; }
+        .container { background: #fff; border-radius: 10px; padding: 24px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        h2 { color: #3182ce; }
+        .resumen { margin: 24px 0; }
+        .resumen th, .resumen td { padding: 6px 10px; }
+        .total { font-size: 1.2em; color: #38b000; font-weight: bold; }
+        .footer { margin-top: 32px; font-size: 0.95em; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>¡Gracias por tu compra!</h2>
+        <p>Hola <strong>{{ pedido.nombre_receptor }}</strong>,</p>
+        <p>Hemos recibido tu pedido <strong>#{{ pedido.id }}</strong>. Aquí tienes el resumen:</p>
+        <table class="resumen" width="100%" border="1" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.producto.nombre }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ item.subtotal|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" align="right">Total:</td>
+                    <td class="total">${{ pedido.total|floatformat:0 }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        <p><strong>Dirección de envío:</strong><br>{{ pedido.direccion_envio }}</p>
+        <p><strong>Contacto:</strong> {{ pedido.email }}<br><strong>WhatsApp:</strong> {{ pedido.telefono }}</p>
+        <div class="footer">
+            <p>Si tienes dudas, contáctanos respondiendo este correo o por WhatsApp.</p>
+            <p>Mi Tienda Online &middot; {{ now|date:'Y' }}</p>
+        </div>
+    </div>
+</body>
+</html> 

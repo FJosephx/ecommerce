@@ -16,7 +16,7 @@
                 <p class="card-text">{{ producto.descripcion }}</p>
                 <p class="card-text"><strong>Precio:</strong> ${{ producto.precio|floatformat:0|intcomma }}</p>
                 <p class="card-text"><strong>Stock:</strong> {{ producto.stock }}</p>
-                <a href="{% url 'productos_list' %}" class="btn btn-secondary">Volver</a>
+                <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
                 {% if user.is_staff %}
                 <a href="{% url 'producto_update' producto.pk %}" class="btn btn-warning">Editar</a>
                 <a href="{% url 'producto_delete' producto.pk %}" class="btn btn-danger">Eliminar</a>

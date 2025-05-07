@@ -11,7 +11,8 @@
     </h2>
 </div>
 {% if items %}
-<div class="table-responsive">
+<!-- Vista de carrito para escritorio -->
+<div class="table-responsive d-none d-md-block">
     <table class="table align-middle bg-white shadow-sm rounded">
         <thead class="table-light">
             <tr>
@@ -33,7 +34,13 @@
                 </td>
                 <td>{{ item.producto.nombre }}</td>
                 <td>${{ item.producto.precio|floatformat:0 }}</td>
-                <td>{{ item.cantidad }}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
+                        <button class="btn btn-outline-secondary btn-sm btn-qty" data-action="decrease" data-item-id="{{ item.id }}" type="button">-</button>
+                        <span class="fw-bold" id="qty-{{ item.id }}">{{ item.cantidad }}</span>
+                        <button class="btn btn-outline-secondary btn-sm btn-qty" data-action="increase" data-item-id="{{ item.id }}" type="button">+</button>
+                    </div>
+                </td>
                 <td>${{ item.subtotal|floatformat:0 }}</td>
                 <td>
                     <a href="{% url 'eliminar_del_carrito' item.id %}" class="btn btn-outline-danger btn-sm" title="Eliminar">
@@ -59,20 +66,43 @@
         </tfoot>
     </table>
 </div>
-<div class="d-flex justify-content-between mt-4">
-    <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
-        </svg>
-        Seguir Comprando
-    </a>
-    <a href="{% url 'checkout' %}" class="btn btn-success">
-        Ir al Resumen
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
-            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 3H1v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6z"/>
-            <path d="M2 10a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1H3v-1z"/>
-        </svg>
-    </a>
+<!-- Vista de carrito para móviles -->
+<div class="d-md-none">
+    {% for item in items %}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            {% if item.producto.imagen %}
+            <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+            {% endif %}
+            <div class="flex-grow-1">
+                <div class="fw-bold">{{ item.producto.nombre }}</div>
+                <div class="text-muted">${{ item.producto.precio|floatformat:0 }} c/u</div>
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <button class="btn btn-outline-secondary btn-sm btn-qty" data-action="decrease" data-item-id="{{ item.id }}" type="button">-</button>
+                    <span class="fw-bold" id="qty-{{ item.id }}">{{ item.cantidad }}</span>
+                    <button class="btn btn-outline-secondary btn-sm btn-qty" data-action="increase" data-item-id="{{ item.id }}" type="button">+</button>
+                </div>
+                <div class="mt-2" id="subtotal-{{ item.id }}"><span class="fw-bold">Subtotal:</span> ${{ item.subtotal|floatformat:0 }}</div>
+            </div>
+            <a href="{% url 'eliminar_del_carrito' item.id %}" class="btn btn-outline-danger btn-sm ms-auto" title="Eliminar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5.5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6zm3 .5a.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1H14a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3a.5.5 0 0 0-.5.5V4h12v-.5a.5.5 0 0 0-.5-.5h-11z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="card shadow-sm mb-3">
+        <div class="card-body text-center">
+            <div class="mb-2">
+                <span class="fw-bold">Total:</span>
+                <span class="fw-bold text-success" style="font-size: 1.2em;">${{ total|floatformat:0 }}</span>
+            </div>
+            <a href="{% url 'checkout' %}" class="btn btn-success w-100 mb-2">Ir al Resumen</a>
+            <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary w-100">Seguir Comprando</a>
+        </div>
+    </div>
 </div>
 {% else %}
 <div class="alert alert-info">
@@ -80,4 +110,48 @@
     <a href="{% url 'catalogo' %}" class="alert-link">Ver catálogo</a>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.btn-qty').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const action = this.getAttribute('data-action');
+            fetch('{% url "actualizar_cantidad_carrito" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `item_id=${itemId}&action=${action}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.cantidad !== undefined) {
+                    document.querySelectorAll(`#qty-${itemId}`).forEach(function(span) {
+                        span.textContent = data.cantidad;
+                    });
+                    // Actualizar subtotal en tabla (escritorio)
+                    const fila = this.closest('tr');
+                    if (fila) {
+                        const celdaSubtotal = fila.querySelector('td:nth-child(5)');
+                        if (celdaSubtotal) celdaSubtotal.textContent = data.subtotal;
+                    }
+                    // Actualizar subtotal en tarjeta (móvil)
+                    const card = this.closest('.card-body');
+                    if (card) {
+                        const subtotalLabel = card.querySelector('#subtotal-' + itemId);
+                        if (subtotalLabel) subtotalLabel.innerHTML = `<span class='fw-bold'>Subtotal:</span> ${data.subtotal}`;
+                    }
+                    // Actualizar total
+                    document.querySelectorAll('span.fw-bold.text-success').forEach(function(span) {
+                        span.textContent = data.total;
+                    });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %} 

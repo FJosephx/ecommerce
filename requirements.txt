@@ -2,3 +2,4 @@ Django==5.2
 Pillow==11.2.1
 django-crispy-forms==2.4
 crispy-bootstrap5==2025.4 
+django-webpay==0.1.0

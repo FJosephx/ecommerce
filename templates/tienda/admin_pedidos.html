@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Gestión de Pedidos{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Gestión de Pedidos</h2>
+    <a href="{% url 'panel_admin' %}" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver al panel</a>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th>WhatsApp</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td>#{{ pedido.id }}</td>
+                    <td>{{ pedido.nombre_receptor }}</td>
+                    <td>{{ pedido.email }}</td>
+                    <td>{{ pedido.telefono }}</td>
+                    <td>${{ pedido.total|floatformat:0 }}</td>
+                    <td>{{ pedido.get_estado_display }}</td>
+                    <td>{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'admin_pedido_detalle' pedido.id %}" class="btn btn-sm btn-info">Ver Detalle</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center">No hay pedidos registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 
