@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Carrito{% endblock %}
+
+{% block content %}
+<div class="mb-4 text-center">
+    <h2 class="mb-3">
+        <img src="{% static 'img/carrito.png' %}" alt="Carrito" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
+        Mi Carrito
+    </h2>
+</div>
+{% if items %}
+<div class="table-responsive">
+    <table class="table align-middle bg-white shadow-sm rounded">
+        <thead class="table-light">
+            <tr>
+                <th></th>
+                <th>Producto</th>
+                <th>Precio Unitario</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td style="width: 60px;">
+                    {% if item.producto.imagen %}
+                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;">
+                    {% endif %}
+                </td>
+                <td>{{ item.producto.nombre }}</td>
+                <td>${{ item.producto.precio|floatformat:0 }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal|floatformat:0 }}</td>
+                <td>
+                    <a href="{% url 'eliminar_del_carrito' item.id %}" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5.5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6zm3 .5a.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2h3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1H14a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3a.5.5 0 0 0-.5.5V4h12v-.5a.5.5 0 0 0-.5-.5h-11z"/>
+                        </svg>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4"></td>
+                <td colspan="2" class="text-end">
+                    <div class="p-2 bg-light border rounded d-inline-block">
+                        <span class="fw-bold">Total:</span>
+                        <span class="fw-bold text-success" style="font-size: 1.2em;">${{ total|floatformat:0 }}</span>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
+        </svg>
+        Seguir Comprando
+    </a>
+    <a href="{% url 'checkout' %}" class="btn btn-success">
+        Ir al Resumen
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
+            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 3H1v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6z"/>
+            <path d="M2 10a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1H3v-1z"/>
+        </svg>
+    </a>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Tu carrito está vacío.
+    <a href="{% url 'catalogo' %}" class="alert-link">Ver catálogo</a>
+</div>
+{% endif %}
+{% endblock %} 

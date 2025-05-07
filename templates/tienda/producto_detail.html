@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Detalle de Producto{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                style="width: 100%; max-width: 280px; height: auto; object-fit: cover; object-position: center; display: block; margin: auto; border-radius: 8px;">
+            {% endif %}
+            <div class="card-body">
+                <h3 class="card-title">{{ producto.nombre }}</h3>
+                <p class="card-text">{{ producto.descripcion }}</p>
+                <p class="card-text"><strong>Precio:</strong> ${{ producto.precio|floatformat:0|intcomma }}</p>
+                <p class="card-text"><strong>Stock:</strong> {{ producto.stock }}</p>
+                <a href="{% url 'productos_list' %}" class="btn btn-secondary">Volver</a>
+                {% if user.is_staff %}
+                <a href="{% url 'producto_update' producto.pk %}" class="btn btn-warning">Editar</a>
+                <a href="{% url 'producto_delete' producto.pk %}" class="btn btn-danger">Eliminar</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

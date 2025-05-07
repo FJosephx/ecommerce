@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resumen del Pedido{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Resumen del Pedido</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">Datos de Envío</h5>
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item"><strong>Nombre de quien recibe:</strong> {{ pedido.nombre_receptor }}</li>
+                        <li class="list-group-item"><strong>Correo electrónico:</strong> {{ pedido.email }}</li>
+                        <li class="list-group-item"><strong>Dirección:</strong> {{ pedido.direccion_envio }}</li>
+                        {% if pedido.usuario %}
+                        <li class="list-group-item"><strong>Usuario:</strong> {{ pedido.usuario.username }}</li>
+                        {% endif %}
+                        <li class="list-group-item"><strong>Fecha:</strong> {{ pedido.fecha_creacion|date:'d/m/Y H:i' }}</li>
+                    </ul>
+                    <h5 class="mb-3">Productos</h5>
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in carrito.itemcarrito_set.all %}
+                            <tr>
+                                <td>{{ item.producto.nombre }}</td>
+                                <td>{{ item.cantidad }}</td>
+                                <td>${{ item.producto.precio|floatformat:0 }}</td>
+                                <td>${{ item.subtotal|floatformat:0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>${{ pedido.total|floatformat:0 }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary">Volver al Catálogo</a>
+                        <a href="{% url 'webpay_iniciar' pedido.id %}" class="btn btn-success btn-lg d-flex align-items-center justify-content-center" style="gap: 8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="white" viewBox="0 0 16 16">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 3H1v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6z"/>
+                                <path d="M2 10a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1H3v-1z"/>
+                            </svg>
+                            Pagar con Webpay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

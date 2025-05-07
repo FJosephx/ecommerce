@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Sesión Cerrada{% endblock %}
+
+{% block content %}
+<div class="form-center">
+    <div class="col-md-5">
+        <div class="card shadow-lg p-4 text-center">
+            <div class="card-body">
+                <svg width="64" height="64" fill="#0d6efd" class="mb-3" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM7 11.414l5.707-5.707-1.414-1.414L7 8.586 4.707 6.293 3.293 7.707 7 11.414z"/>
+                </svg>
+                <h2 class="card-title mb-4">¡Has cerrado sesión!</h2>
+                <p>Gracias por visitar nuestra tienda. ¡Te esperamos pronto!</p>
+                <div class="mt-4">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión nuevamente</a>
+                    <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary ms-2">Volver al Catálogo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

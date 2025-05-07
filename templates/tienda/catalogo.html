@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo de Productos{% endblock %}
+
+{% block content %}
+<div class="row">
+    {% for producto in productos %}
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                style="width: 100%; height: 300px; object-position: center; border-radius: 8px 8px 0 0;">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ producto.nombre }}</h5>
+                <p class="card-text">{{ producto.descripcion }}</p>
+                <p class="card-text"><strong>Precio: ${{ producto.precio|floatformat:0}}</strong></p>
+                <p class="card-text">Stock disponible: {{ producto.stock }}</p>
+                <a href="{% url 'agregar_al_carrito' producto.id %}" class="btn btn-primary">Agregar al Carrito</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No hay productos disponibles en este momento.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

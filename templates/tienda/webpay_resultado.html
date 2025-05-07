@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center mt-5">
+    {% if response.status == "AUTHORIZED" %}
+        <svg width="64" height="64" fill="green" class="mb-3" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM7 11.414l5.707-5.707-1.414-1.414L7 8.586 4.707 6.293 3.293 7.707 7 11.414z"/>
+        </svg>
+        <h2 class="mb-3 text-success">¡Pago realizado con éxito!</h2>
+        <div class="mb-4">
+            <p><strong>Monto pagado:</strong> ${{ response.amount|floatformat:0 }}</p>
+            <p><strong>Orden:</strong> {{ response.buy_order }}</p>
+            <p><strong>Estado:</strong> {{ response.status }}</p>
+            <p><strong>Autorización:</strong> {{ response.authorization_code }}</p>
+        </div>
+        <a href="{% url 'catalogo' %}" class="btn btn-primary">Volver al catálogo</a>
+    {% else %}
+        <svg width="64" height="64" fill="red" class="mb-3" viewBox="0 0 16 16">
+            <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm3.707-9.707-1.414-1.414L8 6.586 5.707 4.293 4.293 5.707 6.586 8l-2.293 2.293 1.414 1.414L8 9.414l2.293 2.293 1.414-1.414L9.414 8l2.293-2.293z"/>
+        </svg>
+        <h2 class="mb-3 text-danger">Pago rechazado o fallido</h2>
+        <div class="mb-4">
+            <p><strong>Estado:</strong> {{ response.status }}</p>
+            <p><strong>Orden:</strong> {{ response.buy_order }}</p>
+        </div>
+        <a href="{% url 'catalogo' %}" class="btn btn-secondary">Volver al catálogo</a>
+    {% endif %}
+</div>
+{% endblock %}

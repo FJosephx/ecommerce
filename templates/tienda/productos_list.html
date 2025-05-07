@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Gestión de Productos{% endblock %}
+
+{% block content %}
+<h2>Gestión de Productos</h2>
+{% if user.is_staff %}
+    <a href="{% url 'producto_create' %}" class="btn btn-success mb-3">Crear nuevo producto</a>
+{% endif %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Imagen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>${{ producto.precio|floatformat:0|intcomma }}</td>
+            <td>{{ producto.stock }}</td>
+            <td>
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                        style="width: 90px; height: 120px; object-fit: cover; border-radius: 4px;">
+                {% endif %}
+                </td>
+            <td>
+                <a href="{% url 'producto_detail' producto.pk %}" class="btn btn-info btn-sm">Ver</a>
+                {% if user.is_staff %}
+                <a href="{% url 'producto_update' producto.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'producto_delete' producto.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No hay productos.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 
