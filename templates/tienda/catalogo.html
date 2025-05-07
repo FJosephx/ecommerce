@@ -16,7 +16,10 @@
                 <p class="card-text">{{ producto.descripcion }}</p>
                 <p class="card-text"><strong>Precio: ${{ producto.precio|floatformat:0}}</strong></p>
                 <p class="card-text">Stock disponible: {{ producto.stock }}</p>
-                <a href="{% url 'agregar_al_carrito' producto.id %}" class="btn btn-primary">Agregar al Carrito</a>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'producto_detail' producto.pk %}" class="btn btn-outline-primary btn-sm">Ver detalle</a>
+                    <a href="{% url 'agregar_al_carrito' producto.id %}" class="btn btn-primary btn-sm">Agregar al Carrito</a>
+                </div>
             </div>
         </div>
     </div>
