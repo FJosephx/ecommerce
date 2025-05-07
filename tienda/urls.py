@@ -17,4 +17,8 @@ urlpatterns = [
     path('resumen/<int:pedido_id>/', views.resumen_pedido, name='resumen_pedido'),
     path('webpay/iniciar/<int:pedido_id>/', views.webpay_iniciar, name='webpay_iniciar'),
     path('webpay/retorno/', views.webpay_retorno, name='webpay_retorno'),
+    path('carrito/actualizar/', views.actualizar_cantidad_carrito, name='actualizar_cantidad_carrito'),
+    path('panel/', views.panel_admin, name='panel_admin'),
+    path('panel/pedidos/', views.admin_pedidos, name='admin_pedidos'),
+    path('panel/pedidos/<int:pedido_id>/', views.admin_pedido_detalle, name='admin_pedido_detalle'),
 ] 

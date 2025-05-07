@@ -50,6 +50,19 @@ class Pedido(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2)
     nombre_receptor = models.CharField(max_length=100, default="Sin nombre")
     email = models.EmailField(default="sinemail@ejemplo.com")
+    telefono = models.CharField(max_length=20, default="", help_text="Número de WhatsApp/contacto")
 
     def __str__(self):
         return f"Pedido #{self.id} - {self.usuario.username}"
+
+class ItemPedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='items')
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    cantidad = models.PositiveIntegerField(default=1)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def subtotal(self):
+        return self.precio_unitario * self.cantidad
+
+    def __str__(self):
+        return f"{self.cantidad} x {self.producto.nombre} (Pedido #{self.pedido.id})"

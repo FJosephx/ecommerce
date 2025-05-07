@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Producto, Carrito, ItemCarrito, Pedido
+from .models import Producto, Carrito, ItemCarrito, Pedido, ItemPedido
 from django.db.models import Sum
 from .forms import CheckoutForm, RegistroForm
 from django.contrib.auth import login
@@ -12,9 +12,17 @@ from django.utils import formats
 from transbank.webpay.webpay_plus.transaction import Transaction
 from transbank.common.integration_type import IntegrationType
 import uuid
+from django.http import JsonResponse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.contrib.admin.views.decorators import staff_member_required
 
 def catalogo(request):
+    q = request.GET.get('q', '').strip()
     productos = Producto.objects.filter(disponible=True)
+    if q:
+        productos = productos.filter(nombre__icontains=q)
     return render(request, 'tienda/catalogo.html', {'productos': productos})
 
 def get_or_create_carrito(request):
@@ -68,6 +76,7 @@ def checkout(request):
             direccion = form.cleaned_data['direccion']
             numero_extra = form.cleaned_data['numero_extra']
             email = form.cleaned_data['email']
+            telefono = form.cleaned_data['telefono']
             direccion_completa = direccion
             if numero_extra:
                 direccion_completa += f" ({numero_extra})"
@@ -76,8 +85,17 @@ def checkout(request):
                 direccion_envio=direccion_completa,
                 total=carrito.total(),
                 nombre_receptor=nombre,
-                email=email
+                email=email,
+                telefono=telefono
             )
+            # Copiar items del carrito a ItemPedido
+            for item in carrito.itemcarrito_set.all():
+                ItemPedido.objects.create(
+                    pedido=pedido,
+                    producto=item.producto,
+                    cantidad=item.cantidad,
+                    precio_unitario=item.producto.precio
+                )
             return redirect('resumen_pedido', pedido_id=pedido.id)
     else:
         form = CheckoutForm()
@@ -192,6 +210,14 @@ def webpay_retorno(request):
             carrito.itemcarrito_set.all().delete()
             if not request.user.is_authenticated:
                 del request.session['carrito_id']
+            # Enviar comprobante de compra por email
+            items = pedido.items.all()
+            subject = f"Comprobante de compra - Pedido #{pedido.id}"
+            to = [pedido.email]
+            html_content = render_to_string('tienda/email_comprobante.html', {'pedido': pedido, 'items': items, 'now': timezone.now()})
+            msg = EmailMultiAlternatives(subject, '', to=to)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
             messages.success(request, 'Pago realizado exitosamente.')
             return render(request, 'tienda/webpay_resultado.html', {'response': response})
         else:
@@ -211,3 +237,63 @@ def resumen_pedido(request, pedido_id):
         return redirect('catalogo')
     carrito = get_or_create_carrito(request)
     return render(request, 'tienda/resumen_pedido.html', {'pedido': pedido, 'carrito': carrito})
+
+def actualizar_cantidad_carrito(request):
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        item_id = request.POST.get('item_id')
+        action = request.POST.get('action')
+        carrito = get_or_create_carrito(request)
+        item = get_object_or_404(ItemCarrito, id=item_id, carrito=carrito)
+        cantidad_actual = item.cantidad
+        stock = item.producto.stock
+        if action == 'increase' and cantidad_actual < stock:
+            item.cantidad += 1
+            item.save()
+        elif action == 'decrease' and cantidad_actual > 1:
+            item.cantidad -= 1
+            item.save()
+        subtotal = item.subtotal()
+        total = carrito.total()
+        return JsonResponse({
+            'cantidad': item.cantidad,
+            'subtotal': f"${subtotal:,.0f}",
+            'total': f"${total:,.0f}"
+        })
+    return JsonResponse({'error': 'Petición inválida'}, status=400)
+
+@staff_member_required
+def panel_admin(request):
+    return render(request, 'tienda/panel_admin.html')
+
+@staff_member_required
+def admin_pedidos(request):
+    pedidos = Pedido.objects.all().order_by('-fecha_creacion')
+    return render(request, 'tienda/admin_pedidos.html', {'pedidos': pedidos})
+
+@staff_member_required
+def admin_pedido_detalle(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    items = pedido.items.all()
+    if request.method == 'POST':
+        if 'eliminar' in request.POST:
+            pedido.delete()
+            messages.success(request, 'Pedido eliminado correctamente.')
+            return redirect('admin_pedidos')
+        elif 'estado' in request.POST:
+            nuevo_estado = request.POST.get('estado')
+            if nuevo_estado in dict(Pedido.ESTADOS):
+                pedido.estado = nuevo_estado
+                pedido.save()
+                messages.success(request, 'Estado del pedido actualizado.')
+            return redirect('admin_pedidos')
+        elif 'enviar_email' in request.POST:
+            asunto = request.POST.get('asunto')
+            mensaje = request.POST.get('mensaje')
+            from_email = None  # Usar el default
+            to = [pedido.email]
+            msg = EmailMultiAlternatives(asunto, '', from_email, to)
+            msg.attach_alternative(mensaje, "text/html")
+            msg.send()
+            messages.success(request, 'Correo enviado al cliente.')
+            return redirect('admin_pedido_detalle', pedido_id=pedido.id)
+    return render(request, 'tienda/admin_pedido_detalle.html', {'pedido': pedido, 'items': items})

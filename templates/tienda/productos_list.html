@@ -8,6 +8,8 @@
 {% if user.is_staff %}
     <a href="{% url 'producto_create' %}" class="btn btn-success mb-3">Crear nuevo producto</a>
 {% endif %}
+<!-- Vista de escritorio -->
+<div class="d-none d-md-block">
 <table class="table table-striped">
     <thead>
         <tr>
@@ -43,4 +45,31 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
+<!-- Vista móvil -->
+<div class="d-md-none">
+    {% for producto in productos %}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" style="width: 60px; height: 80px; object-fit: cover; border-radius: 6px;">
+            {% endif %}
+            <div class="flex-grow-1">
+                <div class="fw-bold">{{ producto.nombre }}</div>
+                <div class="text-muted">Precio: ${{ producto.precio|floatformat:0|intcomma }}</div>
+                <div class="text-muted">Stock: {{ producto.stock }}</div>
+                <div class="mt-2 d-flex gap-2">
+                    <a href="{% url 'producto_detail' producto.pk %}" class="btn btn-info btn-sm">Ver</a>
+                    {% if user.is_staff %}
+                    <a href="{% url 'producto_update' producto.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="{% url 'producto_delete' producto.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">No hay productos.</div>
+    {% endfor %}
+</div>
 {% endblock %} 

@@ -22,6 +22,12 @@ class CheckoutForm(forms.Form):
         label='Correo electrónico',
         required=True
     )
+    telefono = forms.CharField(
+        label='Número de WhatsApp (contacto)',
+        max_length=20,
+        required=True,
+        help_text='Ejemplo: +56912345678'
+    )
 
 class RegistroForm(UserCreationForm):
     email = forms.EmailField(required=True)

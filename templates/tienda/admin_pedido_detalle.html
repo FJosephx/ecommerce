@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Pedido #{{ pedido.id }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Detalle del Pedido #{{ pedido.id }}</h2>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5>Datos del Cliente</h5>
+            <ul class="list-group mb-3">
+                <li class="list-group-item"><strong>Nombre:</strong> {{ pedido.nombre_receptor }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ pedido.email }}</li>
+                <li class="list-group-item"><strong>WhatsApp:</strong> {{ pedido.telefono }}</li>
+                <li class="list-group-item"><strong>Dirección:</strong> {{ pedido.direccion_envio }}</li>
+                <li class="list-group-item"><strong>Fecha:</strong> {{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</li>
+                <li class="list-group-item"><strong>Estado:</strong> 
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <select name="estado" class="form-select d-inline w-auto" style="display:inline-block;">
+                            {% for key, value in pedido.ESTADOS %}
+                                <option value="{{ key }}" {% if pedido.estado == key %}selected{% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary ms-2">Actualizar</button>
+                    </form>
+                </li>
+            </ul>
+            <div class="d-flex gap-2 mb-3">
+                <a href="https://wa.me/{{ pedido.telefono|cut:'+' }}" target="_blank" class="btn btn-success"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+            </div>
+            <form method="post" onsubmit="return confirm('¿Estás seguro de eliminar este pedido?');">
+                {% csrf_token %}
+                <input type="hidden" name="eliminar" value="1">
+                <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Eliminar pedido</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h5>Enviar correo al cliente</h5>
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <input type="hidden" name="enviar_email" value="1">
+                <div class="mb-2">
+                    <label for="asunto" class="form-label">Asunto</label>
+                    <input type="text" class="form-control" name="asunto" id="asunto" required value="Consulta sobre tu pedido #{{ pedido.id }}">
+                </div>
+                <div class="mb-2">
+                    <label for="mensaje" class="form-label">Mensaje (puedes usar HTML)</label>
+                    <textarea class="form-control" name="mensaje" id="mensaje" rows="5" required><p>Estimado/a {{ pedido.nombre_receptor }},</p><p>Te contactamos respecto a tu pedido #{{ pedido.id }}.</p></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-envelope-arrow-up"></i> Enviar correo</button>
+            </form>
+            <h5>Resumen de Productos</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>${{ item.precio_unitario|floatformat:0 }}</td>
+                        <td>${{ item.subtotal|floatformat:0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>${{ pedido.total|floatformat:0 }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <a href="{% url 'admin_pedidos' %}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Volver a la gestión de pedidos</a>
+</div>
+{% endblock %} 

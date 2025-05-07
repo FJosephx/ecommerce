@@ -2,10 +2,11 @@
 .card {
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.2s, transform 0.15s;
 }
 .card:hover {
-    box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 32px rgba(49,130,206,0.13);
 }
 
 /* Botones principales */
@@ -43,7 +44,63 @@
     padding: 18px 0 10px 0;
     text-align: center;
     font-size: 1em;
-    margin-top: 40px;
+    margin-top: auto;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-} 
+}
+
+body, html {
+    font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100%;
+}
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Animaciones y transiciones modernas */
+.btn, .btn-primary, .btn-success, .btn-danger, .btn-secondary {
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.btn:hover, .btn:focus {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 24px rgba(49,130,206,0.13);
+}
+
+/* Estilos para botones de cantidad en el carrito */
+.btn-qty {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2em;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* Toasts personalizados */
+.text-bg-success {
+    background-color: #38b000 !important;
+    color: #fff !important;
+}
+.text-bg-error, .text-bg-danger {
+    background-color: #e53e3e !important;
+    color: #fff !important;
+}
+.text-bg-info {
+    background-color: #3182ce !important;
+    color: #fff !important;
+}
+.text-bg-warning {
+    background-color: #f59e42 !important;
+    color: #fff !important;
+}
+.toast .btn-close {
+    filter: invert(1);
+}
